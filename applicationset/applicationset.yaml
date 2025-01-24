@@ -25,7 +25,7 @@ spec:
       project: default
       source:
         path: "{{path[0]}}/{{path.basename}}"
-        repoURL: https://github.com/VV-Soft-5/app-gitops.git
+        repoURL:  https://github.com/basoyan7/test-gitops.git
         targetRevision: main
       syncPolicy:
         automated:
