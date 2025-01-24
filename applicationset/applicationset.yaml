@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: "myappset"
+  namespace: argocd
+spec:
+  ignoreApplicationDifferences:
+    - jsonPointers:
+        - /spec/syncPolicy
+  generators:
+    - git:
+        repoURL: https://github.com/basoyan7/test-gitops.git
+        revision: main
+        directories:
+          # here it will read the paths under configs and the subpaths under the config paths
+          - path: dev/*
+  template:
+    metadata:
+      namespace: "default"
+      # you can use the path strings with / delimiter as variables
+      name: "{{path.basename}}"
+      labels:
+        name: "{{path.basename}}"
+    spec:
+      project: default
+      source:
+        path: "{{path[0]}}/{{path.basename}}"
+        repoURL: https://github.com/VV-Soft-5/app-gitops.git
+        targetRevision: main
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+      destination:
+        # specify different destinations
+        namespace: default
+        server: https://kubernetes.default.svc
