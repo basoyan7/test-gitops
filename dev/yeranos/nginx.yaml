@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yeranos-deployment
+spec:
+  selector:
+    matchLabels:
+      app: yeranos
+  replicas: 2 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: yeranos
+    spec:
+      containers:
+      - name: yeranos
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
