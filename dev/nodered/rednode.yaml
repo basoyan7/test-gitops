@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nodered-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodered
+  labels:
+    app: nodered
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nodered
+  template:
+    metadata:
+      labels:
+        app: nodered
+    spec:
+      containers:
+      - name: nodered
+        image: nodered/node-red:latest
+        ports:
+        - containerPort: 1880
+        volumeMounts:
+        - name: nodered-data
+          mountPath: /data
+        env:
+        - name: TZ
+          value: "UTC" # Update the timezone as needed
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: nodered-data
+        persistentVolumeClaim:
+          claimName: nodered-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodered
+  labels:
+    app: nodered
+spec:
+  selector:
+    app: nodered
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 1880
+  type: ClusterIP
